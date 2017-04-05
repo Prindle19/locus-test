@@ -19,7 +19,7 @@ import uuid
 
 from datetime import datetime
 from locust import HttpLocust, TaskSet, task
-
+from random import randint
 
 class MetricsTaskSet(TaskSet):
     _deviceid = None
@@ -28,15 +28,16 @@ class MetricsTaskSet(TaskSet):
         self._deviceid = str(uuid.uuid4())
 
     @task(1)
-    def login(self):
-        self.client.post(
-            '/login', {"deviceid": self._deviceid})
-
-    @task(999)
-    def post_metrics(self):
-        self.client.post(
-            "/metrics", {"deviceid": self._deviceid, "timestamp": datetime.now()})
-
+    def tile(self):
+	z = str(randint(0,20))
+	x = str(randint(0,10000000))
+	y = str(randint(0,10000000))
+	name = "loadtest"
+	key = "loadtest"
+	urlString = "/getTile/?z=%s&x=%s&y=%s&key=%s&name=%s" % (z,x,y,key,name) 
+        self.client.get(urlString)
 
 class MetricsLocust(HttpLocust):
     task_set = MetricsTaskSet
+    min_wait = 100
+    max_wait = 5000
